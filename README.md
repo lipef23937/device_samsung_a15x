@@ -22,7 +22,7 @@ The Samsung A15 5G (codenamed _"a15x"_) is an entry-level smartphone from Samsun
 | Storage                 | 64GB / 128GB / 256GB                                        |
 | MicroSD                 | Up to 1 TB                                                  |
 | Battery                 | Non-removable Li-Po 5000 mAh                                |
-| Dimensions              | 162.3 x 77.2 x 8.9 mm                                       |
+| Dimensions              | 160.1 x 76.8 x 8.4 mm                                     |
 | Display                 | 1080 x 2340 (19:5:9), 6.5 inch                              |
 | Rear Camera 1           | 50 MP, f/1.8 (wide),AF                                      |
 | Rear Camera 2           | 5 MP, f/2.2 (ultrawide)                                     |
