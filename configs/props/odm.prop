@@ -1,0 +1,17 @@
+persist.vendor.dc_backlight.enable=false
+ro.product.device_for_attestation=a15x
+ro.product.manufacturer_for_attestation=samsung
+ro.surface_flinger.set_touch_timer_ms=1100
+ro.surface_flinger.use_content_detection_for_refresh_rate=true
+ro.vendor.all_modes.colorpick_adjust=true
+ro.vendor.cabc.enable=true
+ro.vendor.colorpick_adjust=true
+ro.vendor.fod.dimlayer.enable=false
+ro.vendor.fps.switch.default=true
+ro.vendor.gcp.enable=false
+ro.vendor.histogram.enable=false
+ro.vendor.whitepoint_calibration_enable=false
+sys.displayfeature_hidl=true
+vendor.display.idle_time=1100
+vendor.displayfeature.entry.enable=true
+vendor.hbm.enable=true
