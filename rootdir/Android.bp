@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2024 The LineageOS Project
+// Copyright (C) 2025 The LineageOS Project
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -8,6 +8,12 @@
 sh_binary {
     name: "init.insmod.sh",
     src: "bin/init.insmod.sh",
+    vendor: true,
+}
+
+sh_binary {
+    name: "install-recovery.sh",
+    src: "bin/install-recovery.sh",
     vendor: true,
 }
 
@@ -43,6 +49,13 @@ prebuilt_etc {
 prebuilt_etc {
     name: "init.aee.rc",
     src: "etc/init.aee.rc",
+    sub_dir: "init/hw",
+    vendor: true,
+}
+
+prebuilt_etc {
+    name: "init.audio.samsung.rc",
+    src: "etc/init.audio.samsung.rc",
     sub_dir: "init/hw",
     vendor: true,
 }
@@ -104,8 +117,8 @@ prebuilt_etc {
 }
 
 prebuilt_etc {
-    name: "init.sensor_2_0.rc",
-    src: "etc/init.sensor_2_0.rc",
+    name: "init.sec.rc",
+    src: "etc/init.sec.rc",
     sub_dir: "init/hw",
     vendor: true,
 }
@@ -168,7 +181,7 @@ prebuilt_etc {
 
 // fstab
 prebuilt_etc {
-    name: "fstab.emmc",
-    src: "etc/fstab.emmc",
+    name: "fstab.enableswap",
+    src: "etc/fstab.enableswap",
     vendor: true,
 }

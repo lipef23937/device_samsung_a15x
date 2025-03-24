@@ -14,9 +14,6 @@ import /vendor/etc/init/microtrust.rc
 import /vendor/etc/init/android.hardware.boot@1.2-service.rc
 import /vendor/etc/init/android.hardware.boot@1.2-service-lazy.rc
 import /vendor/etc/init/android.hardware.health-service.example.rc
-import /vendor/etc/init/android.hardware.security.keymint.mitee@2.0-service.rc
-import /vendor/etc/init/tee-supplicant.rc
-import /vendor/etc/init/miteelog.rc
 
 #import ${ro.vendor.rc}multi_init.rc
 #phase out multi_init.rc, move related vendor rc to here.
@@ -24,10 +21,26 @@ import /vendor/etc/init/miteelog.rc
 import /vendor/etc/init/aee_aedv.rc
 import /vendor/etc/init/aee_aedv64.rc
 import /vendor/etc/init/storageproxyd.rc
+#import /vendor/etc/init/android.hardware.keymaster@3.0-service.rc
+#import /vendor/etc/init/android.hardware.keymaster@3.0-service.trustonic.rc
+#import /vendor/etc/init/android.hardware.keymaster@4.0-service.rc
+#import /vendor/etc/init/android.hardware.keymaster@4.0-service.trustonic.rc
+#import /vendor/etc/init/android.hardware.keymaster@4.0-service.beanpod.rc
+#import /vendor/etc/init/android.hardware.keymaster@4.0-service.beanpod.lite.rc
+#import /vendor/etc/init/android.hardware.keymaster@4.0-service.trustkernel.rc
+#import /vendor/etc/init/android.hardware.keymaster@4.0-service.mtee.rc
+#import /vendor/etc/init/android.hardware.keymaster@4.1-service.rc
+#import /vendor/etc/init/android.hardware.keymaster@4.1-service.trustonic.rc
+#import /vendor/etc/init/android.hardware.keymaster@4.1-service.beanpod.rc
+#import /vendor/etc/init/android.hardware.keymaster@4.1-service.beanpod.lite.rc
+#import /vendor/etc/init/android.hardware.keymaster@4.1-service.trustkernel.rc
+#import /vendor/etc/init/android.hardware.security.keymint-service.rc
 #import /vendor/etc/init/vendor.mediatek.hardware.keyinstall@1.0-service.rc
 import /vendor/etc/init/vendor.mediatek.hardware.keymanage@1.0-service.rc
 import /vendor/etc/init/android.hardware.audio.service.mediatek.rc
+#import /vendor/etc/init/vendor.mediatek.hardware.keymaster_attestation@1.1-service.rc
 import /vendor/etc/init/android.hardware.nfc@1.2-service-st.rc
+import /vendor/etc/init/tee.rc
 import /vendor/etc/init/vendor.mediatek.hardware.nvram@1.1-sevice.rc
 import /vendor/etc/init/vendor.mediatek.hardware.nvram@1.1-sevice-lazy.rc
 import /vendor/etc/init/android.hardware.light@2.0-service-mediatek.rc
@@ -37,6 +50,9 @@ import /vendor/etc/init/lights-mtk-lazy.rc
 import /vendor/etc/init/merged_hal_service.rc
 import /vendor/etc/init/spm_script.rc
 import /vendor/etc/init/nvram_daemon.rc
+import /vendor/etc/init/microtrust.bp_kmsetkey_ca.rc
+import /vendor/etc/init/vendor.microtrust.hardware.thh@2.0-service.rc
+import /vendor/etc/init/microtrust.init_thh.rc
 #end
 
 #Make sure meta_init.modem.rc is the last rc file.
@@ -167,22 +183,10 @@ on post-fs
 #INTERNAL_END
 
 on late-fs
-    #start keystore2
-    #start vendor.keymaster-3-0
-    #start vendor.keymaster-3-0-trustonic
-    #start vendor.keymaster-4-0
-    #start vendor.keymaster-4-0-trustonic
-    #start vendor.keymaster-4-0-beanpod
-    #start vendor.keymaster-4-1
-    #start vendor.keymaster-4-1-trustonic
-    #start vendor.keymaster-4-1-beanpod
-    #start vendor.keymint-default
-    #start vendor.keymint-trustonic
-    #start vendor.keymint-beanpod
-
-    class_start early_hal
-    start keymaster_attestation-1-1
-    #exec_start wait_for_keymaster
+    # Samsung fix: add delay until tzdaemon service is ready to avoid loading keymaster too early
+    wait_for_prop vendor.tzts_daemon Ready
+    
+    exec_start wait_for_keymaster
     mount_all --late
 
 on post-fs-data
@@ -281,7 +285,7 @@ service loghidlvendorservice /vendor/bin/loghidlvendorservice
     group system shell radio
 
 service meta_tst /vendor/bin/meta_tst
-    user root
+    user system
     group radio system wifi audio bluetooth media gps
     socket meta-atci stream 660 radio system
 
@@ -317,7 +321,7 @@ on property:ro.boot.usbconfig=0 && property:sys.usb.configfs=1
 on property:sys.usb.ffs.ready=1 && property:ro.boot.usbconfig=0 && property:sys.usb.configfs=1
     write /proc/bootprof "INIT:on property:ro.boot.usbconfig=0"
     write /config/usb_gadget/g1/UDC "none"
-    write /config/usb_gadget/g1/strings/0x409/serialnumber "1234567890ABCDEF"
+    write /config/usb_gadget/g1/strings/0x409/serialnumber ${ro.serialno}
     write /config/usb_gadget/g1/configs/b.1/strings/0x409/configuration "adb_acm"
     write /config/usb_gadget/g1/idProduct 0x200E
     symlink /config/usb_gadget/g1/functions/ffs.adb /config/usb_gadget/g1/configs/b.1/f1
@@ -340,7 +344,7 @@ on property:ro.boot.usbconfig=2 && property:sys.usb.configfs=1
     write /proc/bootprof "INIT:on property:ro.boot.usbconfig 2"
     setprop vendor.usb.acm_idx 1,4
     #write /config/usb_gadget/g1/UDC "none"
-    #write /config/usb_gadget/g1/strings/0x409/serialnumber "1234567890ABCDEF"
+    #write /config/usb_gadget/g1/strings/0x409/serialnumber $ro.serialno
     #write /config/usb_gadget/g1/configs/b.1/strings/0x409/configuration "meta_elt"
     #write /config/usb_gadget/g1/idProduct 0x202d
     #symlink /config/usb_gadget/g1/functions/mass_storage.usb0 /config/usb_gadget/g1/configs/b.1/f1
@@ -356,7 +360,7 @@ on property:ro.boot.usbconfig=3 && property:sys.usb.configfs=1
 on property:sys.usb.ffs.ready=1 && property:ro.boot.usbconfig=3 && property:sys.usb.configfs=1
     write /proc/bootprof "INIT:on property:ro.boot.usbconfig 3"
     write /config/usb_gadget/g1/UDC "none"
-    write /config/usb_gadget/g1/strings/0x409/serialnumber "1234567890ABCDEF"
+    write /config/usb_gadget/g1/strings/0x409/serialnumber ${ro.serialno}
     write /config/usb_gadget/g1/configs/b.1/strings/0x409/configuration "meta_elt_adb"
     write /config/usb_gadget/g1/idProduct 0x2040
     write /sys/devices/platform/mt_usb/saving 1

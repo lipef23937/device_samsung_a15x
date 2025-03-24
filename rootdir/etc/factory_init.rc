@@ -426,18 +426,12 @@ on post-fs
 #INTERNAL_END
 
 on late-fs
+    # Samsung fix: add delay until tzdaemon service is ready to avoid loading keymaster too early
+    wait_for_prop vendor.tzts_daemon Ready
 
     # HALs required before storage encryption can get unlocked (FBE/FDE)
     class_start early_hal
     wait_for_prop hwservicemanager.ready "true"
-    start vendor.keymaster-3-0
-    start vendor.keymaster-3-0-trustonic
-    start vendor.keymaster-4-0
-    start vendor.keymaster-4-0-trustonic
-    start vendor.keymaster-4-0-beanpod
-    start vendor.keymaster-4-1-beanpod
-    start vendor.keymint-default
-    start keymaster_attestation-1-1
     exec_start wait_for_keymaster
     mount_all --late
 
